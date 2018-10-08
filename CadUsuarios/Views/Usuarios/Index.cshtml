@@ -1,0 +1,282 @@
+﻿@model IEnumerable<CadUsuarios.Models.Usuario>
+
+<br /><br />
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <h2 class="panel-title pull-left" style="margin-left:10px;">
+                <strong>Usuários</strong>
+            </h2>
+            <button style="margin-right:10px" class="btn btn-primary pull-right" onclick="adicionarUsuario()">Novo Usuário</button>
+        </div>
+    </div>
+
+
+
+    @if (Model.Count() != 0)
+    {
+        foreach (var item in Model)
+        {
+            <div class="panel-body">
+                <table class="table table-striped table-responsive">
+                    <tbody>
+                        <tr>
+                            <td>Nome : @item.Nome </td>
+                            <td>Sobrenome : @item.SobreNome </td>
+                            <td>Email : @item.Email</td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>Telefone</th>
+                                            <th>Endereço</th>
+
+                                        </tr>
+
+                                        @foreach (var detalhe in item.UsuarioDetalhes)
+                                        {
+                                            <tr>
+                                                <td>@detalhe.Telefone</td>
+                                                <td>@detalhe.Endereco</td>
+                                                <td> @Html.ActionLink("Alterar", "Edit", new { id = item.IdUsuario })</td>
+
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="panel-body">
+            <h3 style="color:red;">Não existe usuario(s) cadastrado!</h3>
+        </div>
+
+    }
+</div>
+
+
+@*-- novo*@
+
+<div class="modal fade" id="UsuarioModal">
+    <div class="modal-dialog modal-lg" style=" width: 900px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h4 id="ModalTitle"></h4>
+            </div>
+            <form id="NovoUsuarioForm">
+                <div class="modal-body">
+                    @*Customer Details*@
+                    <h5 style="color:#ff6347">Dados do usuário</h5>
+                    <hr />
+                    <div class="form-horizontal">
+                        <input type="hidden" id="CustomerId" />
+                        <div class="form-group">
+                            <label class="control-label col-md-2">
+                                Nome
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" id="txtNome" name="Nome" placeholder="Informe o nome do usuário" class="form-control" />
+                            </div>
+                            <label class="control-label col-md-2">
+                                Sobre Nome
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" id="txtSobrenome" name="SobreNome" placeholder="Informe o sobrenome do usuário" class="form-control" />
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2">
+                                Email
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" id="txtEmail" name="Email" placeholder="Informe o email do usuário" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <h5 style="margin-top:10px;color:#ff6347">Detalhes do Usuário</h5>
+                    <hr />
+                    <div class="form-horizontal">
+                        <input type="hidden" id="OrderId" />
+                        <div class="form-group">
+                            <label class="control-label col-md-2">
+                                Telefone
+                            </label>
+                            <div class="col-md-4">
+                                <input type="tel" id="txtTelefone" name="Telefone" placeholder="Informe o Telefone" class="form-control" />
+                            </div>
+                            <label class="control-label col-md-2">
+                                Endereço
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" id="txtEndereco" name="Endereco" placeholder="Digite o endereço" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="col-md-2 col-lg-offset-10">
+                                <a id="addDetalhe" class="btn btn-primary">Adicionar</a>
+                            </div>
+                        </div>
+
+                        <table id="detailsTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width:30%">Telefone</th>
+                                    <th style="width:70%">Endereço</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="reset" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button id="SalvarUsuario" type="submit" class="btn btn-success">Salvar usuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        //Show Modal.
+        function adicionarUsuario() {
+            $("#ModalTitle").html("Novo usuário");
+            $("#UsuarioModal").modal();
+        }
+
+
+        //function alterarUsuario(idusuario) {
+        //    var url = "/Usuarios/CarregaUsuarioId?idusuario=" + idusuario;
+
+        //    $.ajax({
+        //        type: "GET",
+        //        url: url,
+        //        success: function (data) {
+        //            var obj = JSON.parse(data);
+        //            $("#txtNome").val(obj.Nome);
+        //            $("#txtSobrenome").val(obj.SobreNome);
+        //            $("#txtEmail").val(obj.Email);
+        //            //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
+        //            //$("#DropDwn option:selected").val(obj.DepartmentId);
+
+        //        }
+        //    })
+        //    $("#ModalTitle").html("Alteração de usuário");
+        //    $("#UsuarioModal").modal();
+        //}
+
+        //function alterarUsuario() {
+        //    $("#UsuarioModal").modal();
+        //}
+
+        //Incluir detalhes na lista
+        $("#addDetalhe").click(function (e) {
+            e.preventDefault();
+
+            if ($.trim($("#txtTelefone").val()) == "" || $.trim($("#txtEndereco").val()) == "") return;
+
+            var varTelefone = $("#txtTelefone").val(),
+                varendereco = $("#txtEndereco").val(),
+                detailsTableBody = $("#detailsTable tbody");
+
+            var varDetalhes = '<tr><td>' + varTelefone + '</td><td>' + varendereco + '</td><td></td><td><a data-itemId="0" href="#" class="deleteItem">Remove</a></td></tr>';
+            detailsTableBody.append(varDetalhes);
+            clearItem();
+
+        });
+
+        function clearItem() {
+            $("#txtTelefone").val('');
+            $("#txtEndereco").val('');
+        }
+
+        $(document).on('click', 'a.deleteItem', function (e) {
+            e.preventDefault();
+            var $self = $(this);
+            if ($(this).attr('data-itemId') == "0") {
+                $(this).parents('tr').css("background-color", "#ff6347").fadeOut(800, function () {
+                    $(this).remove();
+                });
+            }
+        });
+        //After Click Save Button Pass All Data View To Controller For Save Database
+        function SalvarUsuario(data) {
+            return $.ajax({
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST',
+                url: "/Usuarios/SalvarUsuario",
+                data: data,
+                success: function (result) {
+                    alert(result);
+                    location.reload();
+                },
+                error: function () {
+                    alert("Erro para salvar o usuario!")
+                }
+            });
+        }
+        //Collect Multiple Order List For Pass To Controller
+        $("#SalvarUsuario").click(function (e) {
+            e.preventDefault();
+
+            var UsuarioArr = [];
+            UsuarioArr.length = 0;
+
+            debugger;
+            $.each($("#detailsTable tbody tr"), function () {
+                UsuarioArr.push({
+                    telefone: $(this).find('td:eq(0)').html(),
+                    endereco: $(this).find('td:eq(1)').html()
+                });
+            });
+
+
+            var data = JSON.stringify({
+                nome: $("#txtNome").val(),
+                sobrenome: $("#txtSobrenome").val(),
+                email: $("#txtEmail").val(),
+                detalhes: UsuarioArr
+            });
+
+            $.when(SalvarUsuario(data)).then(function (response) {
+                console.log(response);
+            }).fail(function (err) {
+                console.log(err);
+            });
+        });
+
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#txtTelefone").inputmask("mask", { "mask": "(99) 9999-99999" });
+            $("#cpf").inputmask("mask", { "mask": "999.999.999-99" }, { reverse: true });
+            $("#cep").inputmask("mask", { "mask": "99999-999" });
+            $("#nascimento").inputmask("mask", { "mask": "99/99/9999" });
+            $("#preco").inputmask("mask", { "mask": "999.999,99" }, { reverse: true });
+            $("#valor").inputmask("mask", { "mask": "#.##9,99" }, { reverse: true });
+            $("#ip").inputmask("mask", { "mask": "999.999.999.999" });
+        });
+    </script>
+}

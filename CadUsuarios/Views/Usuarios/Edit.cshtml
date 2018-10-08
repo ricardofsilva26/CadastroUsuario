@@ -1,0 +1,206 @@
+﻿@model CadUsuarios.Models.Usuario
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Alterar ou Excluir Usuario</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.IdUsuario)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IdUsuario, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="tel" id="txtIdusuario" readonly="readonly" name="Telefone" value="@Model.IdUsuario" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-horizontal">
+            <input type="hidden" id="CustomerId" />
+            <div class="form-group">
+                <label class="control-label col-md-2">
+                    Nome
+                </label>
+                <div class="col-md-4">
+                    <input type="text" id="txtNome" value="@Model.Nome" name="Nome" placeholder="Informe o nome do usuário" class="form-control" />
+                </div>
+                <label class="control-label col-md-2">
+                    Sobre Nome
+                </label>
+                <div class="col-md-4">
+                    <input type="text" id="txtSobrenome" value="@Model.SobreNome" name="SobreNome" placeholder="Informe o sobrenome do usuário" class="form-control" />
+                </div>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">
+                Email
+            </label>
+            <div class="col-md-4">
+                <input type="text" id="txtEmail" value="@Model.Email" name="Email" placeholder="Informe o email do usuário" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row">
+            <h5 style="margin-top:10px;">Detalhes do Usuário</h5>
+            <hr />
+
+            <div class="form-horizontal">
+                <input type="hidden" id="OrderId" />
+                <div class="form-group">
+                    <label class="control-label col-md-2">
+                        Telefone
+                    </label>
+                    <div class="col-md-3">
+                        <input type="tel" id="txtTelefone" name="Telefone" placeholder="Informe o Telefone" class="form-control" />
+                    </div>
+                    <label class="control-label col-md-2">
+                        Endereço
+                    </label>
+                    <div class="col-md-3">
+                        <input type="text" id="txtEndereco" name="Endereco" placeholder="Digite o endereço" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <a id="addDetalhe" class="btn btn-primary">Adicionar</a>
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+
+                <div class="col-md-2 col-lg-offset-10">
+                    <a id="addDetalhe" class="btn btn-primary">Adicionar</a>
+                </div>
+            </div>*@
+
+                <table id="detailsTable" class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:30%">Telefone</th>
+                            <th style="width:60%">Endereço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detalhe in Model.UsuarioDetalhes)
+                        {
+                            <tr>
+                                <td>@detalhe.Telefone</td>
+                                <td>@detalhe.Endereco</td>
+                                <td><a data-itemId="0" href="#" class="deleteItem">Apagar</a></td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button id="Excluir" type="submit" class="btn btn-danger">Excluir usuário</button>
+                <button id="SalvarUsuario" type="submit" class="btn btn-primary">Salvar usuário</button>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Voltar", "Index")
+</div>
+
+
+
+@section Scripts{
+    <script>
+
+
+        $('#Excluir').click(function () {
+            var url = "/Usuarios/ApagarUsuario";
+            var idusuario = $("#txtIdusuario").val();
+            $.post(url, { idusuario: idusuario }, function (data) {
+                //$("#msg").html(data);
+            });
+        })
+
+
+        //Incluir detalhes na lista
+        $("#addDetalhe").click(function (e) {
+            e.preventDefault();
+
+            if ($.trim($("#txtTelefone").val()) == "" || $.trim($("#txtEndereco").val()) == "") return;
+
+            var varTelefone = $("#txtTelefone").val(),
+                varendereco = $("#txtEndereco").val(),
+                detailsTableBody = $("#detailsTable tbody");
+
+            var varDetalhes = '<tr><td>' + varTelefone + '</td><td>' + varendereco + '</td><td></td><td><a data-itemId="0" href="#" class="deleteItem">Apagar</a></td></tr>';
+            detailsTableBody.append(varDetalhes);
+            clearItem();
+
+        });
+
+        function clearItem() {
+            $("#txtTelefone").val('');
+            $("#txtEndereco").val('');
+        }
+
+        $(document).on('click', 'a.deleteItem', function (e) {
+            e.preventDefault();
+            var $self = $(this);
+            if ($(this).attr('data-itemId') == "0") {
+                $(this).parents('tr').css("background-color", "#ff6347").fadeOut(800, function () {
+                    $(this).remove();
+                });
+            }
+        });
+
+        function SalvarUsuario(data) {
+            return $.ajax({
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST',
+                url: "/Usuarios/AlterarUsuario",
+                data: data,
+                success: function (result) {
+                    alert(result);
+                    location.reload();
+                },
+
+            });
+        }
+
+        $("#SalvarUsuario").click(function (e) {
+            e.preventDefault();
+
+            var UsuarioArr = [];
+            UsuarioArr.length = 0;
+
+            debugger;
+            $.each($("#detailsTable tbody tr"), function () {
+                UsuarioArr.push({
+                    telefone: $(this).find('td:eq(0)').html(),
+                    endereco: $(this).find('td:eq(1)').html()
+                });
+            });
+
+
+            var data = JSON.stringify({
+                idusuario: $("#txtIdusuario").val(),
+                nome: $("#txtNome").val(),
+                sobrenome: $("#txtSobrenome").val(),
+                email: $("#txtEmail").val(),
+                detalhes: UsuarioArr
+            });
+
+            $.when(SalvarUsuario(data)).then(function (response) {
+                console.log(response);
+            }).fail(function (err) {
+                console.log(err);
+            });
+        });
+    </script>
+}

@@ -26,6 +26,8 @@ namespace CadUsuarios.Controllers
         {
             string resultado = "Erro, os dados do usuario estão incompletos";
 
+            string strTeste = string.Empty;
+
             if (nome != null || sobrenome != null || detalhes != null)
             {
                 Usuario usu = new Usuario();
